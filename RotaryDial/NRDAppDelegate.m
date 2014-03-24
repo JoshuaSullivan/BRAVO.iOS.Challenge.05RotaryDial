@@ -7,6 +7,7 @@
 //
 
 #import "NRDAppDelegate.h"
+#import "NRDRotaryInterfaceViewController.h"
 
 @implementation NRDAppDelegate
 
@@ -14,6 +15,8 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    NRDRotaryInterfaceViewController *viewController = [NRDRotaryInterfaceViewController new];
+    self.window.rootViewController = viewController;
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;

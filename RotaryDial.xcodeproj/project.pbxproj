@@ -19,6 +19,9 @@
 		5802B44F18C10FFB0017B151 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5802B43718C10FFB0017B151 /* UIKit.framework */; };
 		5802B45718C10FFB0017B151 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5802B45518C10FFB0017B151 /* InfoPlist.strings */; };
 		5802B45918C10FFB0017B151 /* RotaryDialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5802B45818C10FFB0017B151 /* RotaryDialTests.m */; };
+		7B1CC46418E0BBCB005B1A91 /* NRDRotaryRingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CC46318E0BBCB005B1A91 /* NRDRotaryRingView.m */; };
+		7B1CC46B18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B1CC46918E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.m */; };
+		7B1CC46C18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7B1CC46A18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.xib */; };
 		7DE819F8B3AC4C0184EEDD11 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E6C33B20E6644F608B4FAA16 /* Settings.bundle */; };
 /* End PBXBuildFile section */
 
@@ -49,6 +52,11 @@
 		5802B45418C10FFB0017B151 /* RotaryDialTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RotaryDialTests-Info.plist"; sourceTree = "<group>"; };
 		5802B45618C10FFB0017B151 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5802B45818C10FFB0017B151 /* RotaryDialTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RotaryDialTests.m; sourceTree = "<group>"; };
+		7B1CC46218E0BBCB005B1A91 /* NRDRotaryRingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NRDRotaryRingView.h; sourceTree = "<group>"; };
+		7B1CC46318E0BBCB005B1A91 /* NRDRotaryRingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NRDRotaryRingView.m; sourceTree = "<group>"; };
+		7B1CC46818E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NRDRotaryInterfaceViewController.h; sourceTree = "<group>"; };
+		7B1CC46918E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NRDRotaryInterfaceViewController.m; sourceTree = "<group>"; };
+		7B1CC46A18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NRDRotaryInterfaceViewController.xib; sourceTree = "<group>"; };
 		E6C33B20E6644F608B4FAA16 /* Settings.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = RotaryDial/Resources/Settings.bundle; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -196,6 +204,9 @@
 		C39E31E3426C4D8F8945D5A6 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				7B1CC46818E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.h */,
+				7B1CC46918E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.m */,
+				7B1CC46A18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.xib */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -203,6 +214,8 @@
 		CFC6577CC671420791EBB2CD /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				7B1CC46218E0BBCB005B1A91 /* NRDRotaryRingView.h */,
+				7B1CC46318E0BBCB005B1A91 /* NRDRotaryRingView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -294,6 +307,7 @@
 			files = (
 				5802B43E18C10FFB0017B151 /* InfoPlist.strings in Resources */,
 				5802B44618C10FFB0017B151 /* Images.xcassets in Resources */,
+				7B1CC46C18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.xib in Resources */,
 				7DE819F8B3AC4C0184EEDD11 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -344,7 +358,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7B1CC46418E0BBCB005B1A91 /* NRDRotaryRingView.m in Sources */,
 				5802B44018C10FFB0017B151 /* main.m in Sources */,
+				7B1CC46B18E0D2BC005B1A91 /* NRDRotaryInterfaceViewController.m in Sources */,
 				5802B44418C10FFB0017B151 /* NRDAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

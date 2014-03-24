@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Ben Dolmar. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import UIKit;
 
 @interface NRDAppDelegate : UIResponder <UIApplicationDelegate>
 

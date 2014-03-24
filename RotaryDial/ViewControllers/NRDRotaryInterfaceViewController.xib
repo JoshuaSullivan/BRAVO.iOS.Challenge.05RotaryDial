@@ -18,7 +18,7 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NOH-Z2-fuw" customClass="NRDRotaryRingView">
                     <rect key="frame" x="10" y="134" width="300" height="300"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="300" id="Sxr-CY-Qmh"/>
                         <constraint firstAttribute="width" constant="300" id="avD-4I-MU8"/>

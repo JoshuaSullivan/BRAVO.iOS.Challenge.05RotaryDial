@@ -35,11 +35,12 @@
 
 #pragma mark - RotaryRingViewDelegate
 
-- (void)rotaryRingView:(NRDRotaryRingView *)rotaryRingView didSetAngle:(CGFloat)angle
+- (void)rotaryRingView:(NRDRotaryRingView *)rotaryRingView didSetAngle:(double)angle
 {
-    CGFloat factor = angle / (float)(2.0 * M_PI);
-    CGFloat value = factor * 60.0f;
-    self.valueLabel.text = [NSString stringWithFormat:@"%0d", (int)floorf(value)];
+    double correctedAngle = fmod(angle + 2.5 * M_PI, (2.0 * M_PI));
+    double factor = correctedAngle / (2.0 * M_PI);
+    int value = (int)fmod(round(factor * 60.0), 60.0);
+    self.valueLabel.text = [NSString stringWithFormat:@"%02d", value];
 }
 
 @end

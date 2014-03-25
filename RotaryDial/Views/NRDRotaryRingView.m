@@ -11,8 +11,11 @@
 
 const CGFloat kOuterRadiusMultiplier = 1.0f;
 const CGFloat kInnerRadiusMultiplier = 0.6f;
-const CGFloat kFloatPi = (float)M_PI;
-const CGFloat kKnobArcAngle = kFloatPi / 8.0f;
+
+const double kKnobArcAngle = M_PI / 8.0f;
+
+const double kValueSteps = 60.0;
+const double kSnappingSteps = 12.0;
 
 typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 
@@ -96,7 +99,7 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     _innerBounds = CGRectMake(x1, y1, w1, w1);
 
     // The initial postion of the knob is "North".
-    self.currentAngle = (float)-M_PI_2;
+    self.currentAngle = -M_PI_2;
 
     // Set the fill colors for the ring and knob.
     self.ringFillColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
@@ -131,29 +134,33 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     CGContextEOFillPath(c);
     
     // Calculate values for drawing the knob
-    CGFloat a0 = _currentAngle - kKnobArcAngle;
-    CGFloat a1 = _currentAngle + kKnobArcAngle;
-    CGFloat x0 = cosf(a0) * _outerRadius + _centerPoint.x;
-    CGFloat y0 = sinf(a0) * _outerRadius + _centerPoint.y;
-    
+    double a0 = _currentAngle - kKnobArcAngle;
+    double a1 = _currentAngle + kKnobArcAngle;
+    CGFloat a0f = (float)a0;
+    CGFloat a1f = (float)a1;
+    CGFloat x0 = (float)cos(a0) * _outerRadius + _centerPoint.x;
+    CGFloat y0 = (float)sin(a0) * _outerRadius + _centerPoint.y;
+
     // Draw the knob
     CGContextBeginPath(c);
     CGContextMoveToPoint(c, x0, y0);
-    CGContextAddArc(c, _centerPoint.x, _centerPoint.y, _outerRadius, a0, a1, 0);
-    CGContextAddArc(c, _centerPoint.x, _centerPoint.y, _innerRadius, a1, a0, 1);
+    CGContextAddArc(c, _centerPoint.x, _centerPoint.y, _outerRadius, a0f, a1f, 0);
+    CGContextAddArc(c, _centerPoint.x, _centerPoint.y, _innerRadius, a1f, a0f, 1);
     CGContextClosePath(c);
     CGContextSetFillColorWithColor(c, self.knobFillColor.CGColor);
     CGContextFillPath(c);
     CGContextRestoreGState(c);
 }
 
-- (void)setCurrentAngle:(CGFloat)currentAngle
+#pragma mark - Setter for the current angle
+
+- (void)setCurrentAngle:(double)newAngle
 {
-    if (currentAngle != _currentAngle) {
-        CGFloat twoPi = 2.0f * kFloatPi;
-        _currentAngle = fmodf(currentAngle + twoPi, twoPi);
+    newAngle = [self normalizeAngle:newAngle];
+    if (newAngle != _currentAngle) {
+        _currentAngle = newAngle;
         if ([self.delegate respondsToSelector:@selector(rotaryRingView:didSetAngle:)]) {
-            [self.delegate rotaryRingView:self didSetAngle:fmodf(_currentAngle + (kFloatPi / 2), twoPi)];
+            [self.delegate rotaryRingView:self didSetAngle:_currentAngle];
         }
         [self setNeedsDisplay];
     }
@@ -164,22 +171,23 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 - (void)handleTapGesture:(UITapGestureRecognizer *)tapGesture
 {
     if (tapGesture.state == UIGestureRecognizerStateRecognized) {
-        CGFloat twoPi = 2.0f * kFloatPi;
         CGPoint touchPoint = [tapGesture locationInView:self];
         RotaryRingTouchRegion touchRegion = [self calculateTouchRegionForPoint:touchPoint];
         switch (touchRegion) {
             case RotaryRingTouchRegionClockwiseFromKnob: {
                 // Find the next higher twelveth
-                CGFloat twelveth = fmodf((_currentAngle + kFloatPi * 2.5f), twoPi) * 12.0f;
-                CGFloat targetTwelveth = roundf(twelveth + 0.5f);
-                self.currentAngle = targetTwelveth / 12.0f * (2.0f * kFloatPi);
+                double minute = round(_currentAngle / M_2PI * kValueSteps);
+                int twelveth = (int)(minute / (kValueSteps / kSnappingSteps));
+                int targetTwelveth = twelveth + 1;
+                self.currentAngle = (double)targetTwelveth / kSnappingSteps * M_2PI;
                 break;
             }
             case RotaryRingTouchRegionCounterclockwiseFromKnob: {
                 // Find the next lower twelveth
-                CGFloat twelveth = fmodf((_currentAngle + kFloatPi * 2.5f), twoPi) * 12.0f;
-                CGFloat targetTwelveth = roundf(twelveth - 0.5f) + 12.0f;
-                self.currentAngle = targetTwelveth / 12.0f * (2.0f * kFloatPi);
+                double minute = round(_currentAngle / M_2PI * kValueSteps);
+                int twelveth = (int)(minute / (kValueSteps / kSnappingSteps));
+                int targetTwelveth = twelveth - 1;
+                self.currentAngle = (double)targetTwelveth / kSnappingSteps * M_2PI;
                 break;
             }
             default:
@@ -225,19 +233,36 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 {
     CGPoint radialPoint = CGPointMake(touchPoint.x - _centerPoint.x, touchPoint.y - _centerPoint.y);
     CGFloat radius = sqrtf(powf(radialPoint.x, 2.0f) + powf(radialPoint.y, 2.0f));
-    CGFloat angle = atan2f(radialPoint.y, radialPoint.x);
+    double angle = atan2(radialPoint.y, radialPoint.x);
+    double deltaAngle = [self angleBetweenFirstAngle:_currentAngle secondAngle:angle];
     if (radius < _innerRadius || radius > _outerRadius) {
         return RotaryRingTouchRegionOutside;
     }
-    else if (fabsf(angle - _currentAngle) <= kKnobArcAngle) {
+    else if (fabs(deltaAngle) <= kKnobArcAngle) {
         return RotaryRingTouchRegionInsideKnob;
     }
-    else if (angle > _currentAngle) {
+    else if (deltaAngle > 0.0) {
         return RotaryRingTouchRegionClockwiseFromKnob;
     }
     else {
         return RotaryRingTouchRegionCounterclockwiseFromKnob;
     }
+}
+
+#pragma mark - Angle helpers
+
+- (double)normalizeAngle:(double)angle
+{
+    return [self angleBetweenFirstAngle:0.0f secondAngle:angle];
+}
+
+- (double)angleBetweenFirstAngle:(double)firstAngle secondAngle:(double)secondAngle
+{
+    double diff = fmod(secondAngle - firstAngle + M_PI, M_2PI);
+    if (diff < 0.0) {
+        diff += M_2PI;
+    }
+    return diff - M_PI;
 }
 
 @end

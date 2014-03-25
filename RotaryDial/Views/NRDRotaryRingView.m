@@ -32,6 +32,23 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     RotaryRingTouchRegionCounterclockwiseFromKnob
 };
 
+
+#pragma mark - Angle helpers
+
+double diffAngle(double a, double b)
+{
+    double diff = fmod(b - a + M_PI, M_2PI);
+    if (diff < 0.0) {
+        diff += M_2PI;
+    }
+    return diff - M_PI;
+}
+
+double normalizeAngle(double angle)
+{
+    return diffAngle(0.0, angle);
+}
+
 @interface NRDRotaryRingView () {
     /** The calculated outer radius of the ring and knob. */
     CGFloat _outerRadius;
@@ -156,7 +173,7 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 
 - (void)setCurrentAngle:(double)newAngle
 {
-    newAngle = [self normalizeAngle:newAngle];
+    newAngle = normalizeAngle(newAngle);
     if (newAngle != _currentAngle) {
         _currentAngle = newAngle;
         if ([self.delegate respondsToSelector:@selector(rotaryRingView:didSetAngle:)]) {
@@ -176,18 +193,18 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
         switch (touchRegion) {
             case RotaryRingTouchRegionClockwiseFromKnob: {
                 // Find the next higher twelveth
-                double minute = round(_currentAngle / M_2PI * kValueSteps);
-                int twelveth = (int)(minute / (kValueSteps / kSnappingSteps));
+                double minute = round(_currentAngle *  (kValueSteps / M_2PI));
+                int twelveth = (int)floor(minute / (kValueSteps / kSnappingSteps));
                 int targetTwelveth = twelveth + 1;
-                self.currentAngle = (double)targetTwelveth / kSnappingSteps * M_2PI;
+                self.currentAngle = (double)targetTwelveth * (M_2PI / kSnappingSteps);
                 break;
             }
             case RotaryRingTouchRegionCounterclockwiseFromKnob: {
                 // Find the next lower twelveth
-                double minute = round(_currentAngle / M_2PI * kValueSteps);
-                int twelveth = (int)(minute / (kValueSteps / kSnappingSteps));
+                double minute = round(_currentAngle *  (kValueSteps / M_2PI));
+                int twelveth = (int)ceil(minute / (kValueSteps / kSnappingSteps));
                 int targetTwelveth = twelveth - 1;
-                self.currentAngle = (double)targetTwelveth / kSnappingSteps * M_2PI;
+                self.currentAngle = (double)targetTwelveth * (M_2PI / kSnappingSteps);
                 break;
             }
             default:
@@ -234,7 +251,7 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     CGPoint radialPoint = CGPointMake(touchPoint.x - _centerPoint.x, touchPoint.y - _centerPoint.y);
     CGFloat radius = sqrtf(powf(radialPoint.x, 2.0f) + powf(radialPoint.y, 2.0f));
     double angle = atan2(radialPoint.y, radialPoint.x);
-    double deltaAngle = [self angleBetweenFirstAngle:_currentAngle secondAngle:angle];
+    double deltaAngle = diffAngle(_currentAngle, angle);
     if (radius < _innerRadius || radius > _outerRadius) {
         return RotaryRingTouchRegionOutside;
     }
@@ -249,20 +266,5 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     }
 }
 
-#pragma mark - Angle helpers
-
-- (double)normalizeAngle:(double)angle
-{
-    return [self angleBetweenFirstAngle:0.0f secondAngle:angle];
-}
-
-- (double)angleBetweenFirstAngle:(double)firstAngle secondAngle:(double)secondAngle
-{
-    double diff = fmod(secondAngle - firstAngle + M_PI, M_2PI);
-    if (diff < 0.0) {
-        diff += M_2PI;
-    }
-    return diff - M_PI;
-}
 
 @end

@@ -29,8 +29,11 @@
                     </connections>
                 </view>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qdu-VS-NrM" userLabel="Rotary Value Display">
-                    <rect key="frame" x="140" y="243" width="41" height="83"/>
+                    <rect key="frame" x="100" y="243" width="120" height="83"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="120" id="QBc-H1-eYF"/>
+                    </constraints>
                     <fontDescription key="fontDescription" name="HelveticaNeue-UltraLightItalic" family="Helvetica Neue" pointSize="72"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>

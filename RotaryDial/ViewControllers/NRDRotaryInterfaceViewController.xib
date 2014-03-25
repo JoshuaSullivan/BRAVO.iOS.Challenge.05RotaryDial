@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="5053"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NRDRotaryInterfaceViewController">
             <connections>
                 <outlet property="ringView" destination="NOH-Z2-fuw" id="a9s-Kb-jzg"/>
+                <outlet property="valueLabel" destination="Qdu-VS-NrM" id="Z6b-vT-rcS"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -23,11 +24,23 @@
                         <constraint firstAttribute="height" constant="300" id="Sxr-CY-Qmh"/>
                         <constraint firstAttribute="width" constant="300" id="avD-4I-MU8"/>
                     </constraints>
+                    <connections>
+                        <outlet property="delegate" destination="-1" id="veR-HI-0wY"/>
+                    </connections>
                 </view>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qdu-VS-NrM" userLabel="Rotary Value Display">
+                    <rect key="frame" x="147" y="256" width="27" height="57"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" name="HelveticaNeue-ThinItalic" family="Helvetica Neue" pointSize="48"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="centerX" secondItem="NOH-Z2-fuw" secondAttribute="centerX" id="B4y-3C-Ko3"/>
+                <constraint firstItem="Qdu-VS-NrM" firstAttribute="centerY" secondItem="NOH-Z2-fuw" secondAttribute="centerY" id="dwk-nd-1la"/>
+                <constraint firstItem="Qdu-VS-NrM" firstAttribute="centerX" secondItem="NOH-Z2-fuw" secondAttribute="centerX" id="hiS-kD-NgU"/>
                 <constraint firstAttribute="centerY" secondItem="NOH-Z2-fuw" secondAttribute="centerY" id="lF0-yQ-dC5"/>
             </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>

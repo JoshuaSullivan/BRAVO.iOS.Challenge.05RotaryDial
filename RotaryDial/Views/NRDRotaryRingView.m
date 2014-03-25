@@ -11,7 +11,8 @@
 
 const CGFloat kOuterRadiusMultiplier = 1.0f;
 const CGFloat kInnerRadiusMultiplier = 0.6f;
-const CGFloat kKnobArcAngle = (float)M_PI / 8.0f;
+const CGFloat kFloatPi = (float)M_PI;
+const CGFloat kKnobArcAngle = kFloatPi / 8.0f;
 
 typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 
@@ -43,6 +44,9 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 
     /** The bonding box of the inner edge of the ring. */
     CGRect _innerBounds;
+
+    /** The starting point of the current drag. */
+    CGPoint _startingPoint;
 }
 
 /** The fill color for the ring. */
@@ -97,7 +101,17 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     // Set the fill colors for the ring and knob.
     self.ringFillColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
     self.knobFillColor = [UIColor colorWithWhite:0.4f alpha:1.0f];
+
+    // Create the gesture recognizers.
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                                 action:@selector(handleTapGesture:)];
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self
+                                                                                 action:@selector(handlePanGesture:)];
+    [self addGestureRecognizer:tapGesture];
+    [self addGestureRecognizer:panGesture];
 }
+
+#pragma mark - View drawing
 
 - (void)drawRect:(CGRect)rect
 {
@@ -136,8 +150,72 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
 - (void)setCurrentAngle:(CGFloat)currentAngle
 {
     if (currentAngle != _currentAngle) {
-        _currentAngle = currentAngle;
+        CGFloat twoPi = 2.0f * kFloatPi;
+        _currentAngle = fmodf(currentAngle + twoPi, twoPi);
+        if ([self.delegate respondsToSelector:@selector(rotaryRingView:didSetAngle:)]) {
+            [self.delegate rotaryRingView:self didSetAngle:fmodf(_currentAngle + (kFloatPi / 2), twoPi)];
+        }
         [self setNeedsDisplay];
+    }
+}
+
+#pragma mark - Gesture Recognizer handlers
+
+- (void)handleTapGesture:(UITapGestureRecognizer *)tapGesture
+{
+    if (tapGesture.state == UIGestureRecognizerStateRecognized) {
+        CGFloat twoPi = 2.0f * kFloatPi;
+        CGPoint touchPoint = [tapGesture locationInView:self];
+        RotaryRingTouchRegion touchRegion = [self calculateTouchRegionForPoint:touchPoint];
+        switch (touchRegion) {
+            case RotaryRingTouchRegionClockwiseFromKnob: {
+                // Find the next higher twelveth
+                CGFloat twelveth = fmodf((_currentAngle + kFloatPi * 2.5f), twoPi) * 12.0f;
+                CGFloat targetTwelveth = roundf(twelveth + 0.5f);
+                self.currentAngle = targetTwelveth / 12.0f * (2.0f * kFloatPi);
+                break;
+            }
+            case RotaryRingTouchRegionCounterclockwiseFromKnob: {
+                // Find the next lower twelveth
+                CGFloat twelveth = fmodf((_currentAngle + kFloatPi * 2.5f), twoPi) * 12.0f;
+                CGFloat targetTwelveth = roundf(twelveth - 0.5f) + 12.0f;
+                self.currentAngle = targetTwelveth / 12.0f * (2.0f * kFloatPi);
+                break;
+            }
+            default:
+                // Taps don't apply to the knob or regions outside the ring.
+                return;
+        }
+    }
+}
+
+- (void)handlePanGesture:(UIPanGestureRecognizer *)panGesture
+{
+    switch (panGesture.state) {
+        case UIGestureRecognizerStateBegan: {
+            CGPoint touchPoint = [panGesture locationInView:self];
+            RotaryRingTouchRegion touchRegion = [self calculateTouchRegionForPoint:touchPoint];
+            if (touchRegion != RotaryRingTouchRegionInsideKnob) {
+                // Cancel any gesture that doesn't start inside the knob.
+                panGesture.enabled = NO;
+                panGesture.enabled = YES;
+                return;
+            }
+            _startingPoint = CGPointMake(touchPoint.x - _centerPoint.x, touchPoint.y - _centerPoint.y);
+            break;
+        }
+        case UIGestureRecognizerStateChanged: {
+            CGPoint panDelta = [panGesture translationInView:self];
+            CGFloat dragX = _startingPoint.x + panDelta.x;
+            CGFloat dragY = _startingPoint.y + panDelta.y;
+            CGFloat newAngle = atan2f(dragY, dragX);
+            if (newAngle != _currentAngle) {
+                self.currentAngle = newAngle;
+            }
+            break;
+        }
+        default:
+            return;
     }
 }
 
@@ -148,7 +226,18 @@ typedef NS_ENUM(NSInteger, RotaryRingTouchRegion) {
     CGPoint radialPoint = CGPointMake(touchPoint.x - _centerPoint.x, touchPoint.y - _centerPoint.y);
     CGFloat radius = sqrtf(powf(radialPoint.x, 2.0f) + powf(radialPoint.y, 2.0f));
     CGFloat angle = atan2f(radialPoint.y, radialPoint.x);
-    return RotaryRingTouchRegionInsideKnob;
+    if (radius < _innerRadius || radius > _outerRadius) {
+        return RotaryRingTouchRegionOutside;
+    }
+    else if (fabsf(angle - _currentAngle) <= kKnobArcAngle) {
+        return RotaryRingTouchRegionInsideKnob;
+    }
+    else if (angle > _currentAngle) {
+        return RotaryRingTouchRegionClockwiseFromKnob;
+    }
+    else {
+        return RotaryRingTouchRegionCounterclockwiseFromKnob;
+    }
 }
 
 @end

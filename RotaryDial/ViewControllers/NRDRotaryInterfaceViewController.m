@@ -9,9 +9,10 @@
 #import "NRDRotaryInterfaceViewController.h"
 #import "NRDRotaryRingView.h"
 
-@interface NRDRotaryInterfaceViewController ()
+@interface NRDRotaryInterfaceViewController () <RotaryRingViewDelegate>
 
 @property (weak, nonatomic) IBOutlet NRDRotaryRingView *ringView;
+@property (weak, nonatomic) IBOutlet UILabel *valueLabel;
 
 @end
 
@@ -32,10 +33,13 @@
     // Do any additional setup after loading the view from its nib.
 }
 
-- (void)didReceiveMemoryWarning
+#pragma mark - RotaryRingViewDelegate
+
+- (void)rotaryRingView:(NRDRotaryRingView *)rotaryRingView didSetAngle:(CGFloat)angle
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    CGFloat factor = angle / (float)(2.0 * M_PI);
+    CGFloat value = factor * 60.0f;
+    self.valueLabel.text = [NSString stringWithFormat:@"%0d", (int)floorf(value)];
 }
 
 @end
